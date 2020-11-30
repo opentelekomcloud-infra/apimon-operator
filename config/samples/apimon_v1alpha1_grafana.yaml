@@ -1,0 +1,6 @@
+apiVersion: apimon.otc-service.com/v1alpha1
+kind: Grafana
+metadata:
+  name: grafana-sample
+spec:
+  foo: bar

@@ -1,0 +1,79 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: manager-role
+rules:
+  ##
+  ## Base operator rules
+  ##
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+      - pods
+      - pods/exec
+      - pods/log
+      - services
+      - configmaps
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - apps
+      - route.openshift.io
+    resources:
+      - deployments
+      - daemonsets
+      - replicasets
+      - statefulsets
+      - routes
+      - routes/custom-host
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  ##
+  ## Rules for apimon.otc-service.com/v1alpha1, Kind: Grafana
+  ##
+  - apiGroups:
+      - apimon.otc-service.com
+    resources:
+      - grafanas
+      - grafanas/status
+      - grafanas/finalizers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  ##
+  ## Rules for apimon.otc-service.com/v1alpha1, Kind: Alerta
+  ##
+  - apiGroups:
+      - apimon.otc-service.com
+    resources:
+      - alerta
+      - alerta/status
+      - alerta/finalizers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+# +kubebuilder:scaffold:rules

@@ -1,0 +1,17 @@
+---
+# defaults file for Grafana
+state: present
+config_revision: 0
+replicas: 2
+renderer_image: grafana/grafana-image-renderer
+image: grafana/grafana
+plugins: blackmirror1-singlestat-math-panel,snuids-trafficlights-panel
+secret: grafana-secret
+config: grafana-config
+config_dashboard: grafana-config-dashboard
+config_ldap: grafana-config-ldap
+config_ldap_ca_cert: grafana-config-ldap-ca-cert 
+ssl_cert: grafana-ssl-cert
+ldap_server_ip:
+ldap_server_name:
+fqdn: grafana.apimon.otc-service.com

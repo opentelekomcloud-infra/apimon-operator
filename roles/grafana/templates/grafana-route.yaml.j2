@@ -1,0 +1,16 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: grafana
+spec:
+  host: "{{ fqdn }}"
+  port:
+    targetPort: 3000
+  to:
+    kind: Service
+    name: grafana
+    weight: 100
+  tls:
+    termination: passthrough
+    insecureEdgeTerminationPolicy: None
+  wildcardPolicy: None

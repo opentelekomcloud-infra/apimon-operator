@@ -1,6 +1,7 @@
 ---
 # defaults file for Grafana
 state: present
+name: apimon-grafana
 config_revision: 0
 replicas: 2
 renderer_image: grafana/grafana-image-renderer
@@ -11,7 +12,8 @@ config: grafana-config
 config_dashboard: grafana-config-dashboard
 config_ldap: grafana-config-ldap
 config_ldap_ca_cert: grafana-config-ldap-ca-cert 
-ssl_cert: grafana-ssl-cert
 ldap_server_ip:
 ldap_server_name:
 fqdn: grafana.apimon.otc-service.com
+cluster_issuer:
+ssl_cert: 

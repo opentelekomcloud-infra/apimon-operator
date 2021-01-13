@@ -27,6 +27,7 @@ rules:
   - apiGroups:
       - apps
       - route.openshift.io
+      - networking.k8s.io
     resources:
       - deployments
       - daemonsets
@@ -34,6 +35,7 @@ rules:
       - statefulsets
       - routes
       - routes/custom-host
+      - ingresses
     verbs:
       - create
       - delete

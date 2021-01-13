@@ -3,10 +3,8 @@
   set_fact:
     grafana_secret_exists: "{{ lookup('k8s', api_version='v1', kind='Secret', namespace=ansible_operator_meta.namespace, resource_name=secret) }}"
     grafana_config_exists: "{{ lookup('k8s', api_version='v1', kind='ConfigMap', namespace=ansible_operator_meta.namespace, resource_name=config) }}"
-    grafana_config_dashboard_exists: "{{ lookup('k8s', api_version='v1', kind='ConfigMap', namespace=ansible_operator_meta.namespace, resource_name=config_dashboard) }}"
     grafana_config_ldap_exists: "{{ lookup('k8s', api_version='v1', kind='ConfigMap', namespace=ansible_operator_meta.namespace, resource_name=config_ldap) }}"
     grafana_config_ldap_ca_cert_exists: "{{ lookup('k8s', api_version='v1', kind='ConfigMap', namespace=ansible_operator_meta.namespace, resource_name=config_ldap_ca_cert) }}"
-    grafana_ssl_cert_exists: "{{ lookup('k8s', api_version='v1', kind='Secret', namespace=ansible_operator_meta.namespace, resource_name=ssl_cert) }}"
 
 - name: start Grafana deployment 
   community.kubernetes.k8s:
@@ -20,8 +18,8 @@
     namespace: '{{ ansible_operator_meta.namespace }}'
     definition: "{{ lookup('template', 'grafana-service.yaml.j2') | from_yaml }}"
 
-- name: create Grafana route for external access
+- name: manage Grafana ingress
   community.kubernetes.k8s:
     state: "{{ state }}"
     namespace: '{{ ansible_operator_meta.namespace }}'
-    definition: "{{ lookup('template', 'grafana-route.yaml.j2') | from_yaml }}"
+    definition: "{{ lookup('template', 'grafana-ingress.yaml.j2') | from_yaml }}"

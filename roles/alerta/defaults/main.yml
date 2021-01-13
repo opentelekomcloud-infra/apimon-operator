@@ -1,2 +1,14 @@
 ---
-# defaults file for Alerta
+# defaults file for Grafana
+state: present
+name: apimon-alerta
+config_revision: 0
+replicas: 2
+image: alerta/alerta-web
+secret: alerta-secret
+config: alerta-config
+ldap_server_ip:
+ldap_server_name:
+fqdn: alerta.apimon.otc-service.com
+cluster_issuer:
+ssl_cert: 

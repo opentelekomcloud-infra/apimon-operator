@@ -5,13 +5,13 @@ metadata:
   annotations: 
     config_revision : "{{ config_revision }}"
   labels:
-    run: grafana
-  name: grafana
+    run: "{{ name }}"
+  name: "{{ name }}"
 spec:
   replicas: {{ replicas }}
   selector:
     matchLabels:
-      run: grafana
+      run: "{{ name }}"
   strategy: {}
   template:
     metadata:
@@ -19,7 +19,7 @@ spec:
         config_revision : "{{ config_revision }}"
       creationTimestamp: null
       labels:
-        run: grafana
+        run: "{{ name }}"
     spec:
       hostAliases:
 {% if ldap_server_ip is defined and ldap_server_ip|length and 
@@ -33,7 +33,7 @@ spec:
         - "{{ fqdn }}"
       containers:
       - image: "{{ renderer_image }}" 
-        name: grafana-renderer
+        name: "{{ name }}-renderer"
         ports:
         - containerPort: 8081
         resources:
@@ -41,7 +41,7 @@ spec:
             cpu: 500m
             memory: 500Mi
       - image: "{{ image }}"
-        name: grafana
+        name: "{{ name }}"
         ports:
         - containerPort: 3000
         resources:
@@ -54,12 +54,12 @@ spec:
         readinessProbe:
           httpGet:
             path: /login
-            scheme: HTTPS
+            scheme: HTTP
             port: 3000
         livenessProbe:
           httpGet:
             path: /healthz
-            scheme: HTTPS
+            scheme: HTTP
             port: 3000
         affinity:
           podAntiAffinity:
@@ -71,13 +71,13 @@ spec:
                   - key: run
                     operator: In
                     values:
-                    - grafana
+                    - "{{ name }}"
                 topologyKey: kubernetes.io/hostname
         env:
           - name: GF_RENDERING_SERVER_URL
             value: http://localhost:8081/render
           - name: GF_RENDERING_CALLBACK_URL
-            value: https://{{ fqdn }}:3000
+            value: http://{{ fqdn }}:3000
           - name: GF_INSTALL_PLUGINS
             value: "{{ plugins }}"
 {% if grafana_secret_exists is defined and grafana_secret_exists|length %}
@@ -101,11 +101,6 @@ spec:
           mountPath: /etc/grafana/ldap-root-ca-cert.crt
           subPath: ldap-root-ca-cert.crt
 {% endif %}
-{% if grafana_ssl_cert_exists is defined and grafana_ssl_cert_exists|length %}
-        - name: grafana-ssl-cert
-          mountPath: /etc/grafana/ssl
-          defaultMode: 0400
-{% endif %}
       volumes:
 {% if grafana_config_exists is defined and grafana_config_exists|length %}
       - configMap:
@@ -121,10 +116,5 @@ spec:
       - configMap:
           name: "{{ config_ldap_ca_cert }}"
         name: grafana-config-ldap-ca-cert
-{% endif %}
-{% if grafana_ssl_cert_exists is defined and grafana_ssl_cert_exists|length %}
-      - secret:
-          secretName: "{{ ssl_cert }}"
-        name: grafana-ssl-cert
 {% endif %}
 status: {}

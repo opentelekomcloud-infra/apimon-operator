@@ -7,8 +7,8 @@ replicas: 2
 image: alerta/alerta-web
 secret: alerta-secret
 config: alerta-config
-ldap_server_ip:
-ldap_server_name:
+ldap_server_ip: ''
+ldap_server_name: ''
 fqdn: alerta.apimon.otc-service.com
-cluster_issuer:
-ssl_cert: 
+cluster_issuer: ''
+ssl_cert: ''

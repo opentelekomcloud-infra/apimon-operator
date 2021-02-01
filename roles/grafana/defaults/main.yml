@@ -12,8 +12,8 @@ config: grafana-config
 config_dashboard: grafana-config-dashboard
 config_ldap: grafana-config-ldap
 config_ldap_ca_cert: grafana-config-ldap-ca-cert 
-ldap_server_ip:
-ldap_server_name:
+ldap_server_ip: ''
+ldap_server_name: ''
 fqdn: grafana.apimon.otc-service.com
-cluster_issuer:
-ssl_cert: 
+cluster_issuer: ''
+ssl_cert: ''

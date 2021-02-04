@@ -1,0 +1,22 @@
+---
+- name: Get config status 
+  set_fact:
+    alerta_webaddon_secret_exists: "{{ lookup('k8s', api_version='v1', kind='Secret', namespace=ansible_operator_meta.namespace, resource_name=secret) }}"
+
+- name: start Alerta webaddon deployment 
+  community.kubernetes.k8s:
+    state: "{{ state }}"
+    namespace: '{{ ansible_operator_meta.namespace }}'
+    definition: "{{ lookup('template', 'alerta-webaddon-deployment.yaml.j2') | from_yaml }}"
+
+- name: expose Alerta webaddon deployment with service
+  community.kubernetes.k8s:
+    state: "{{ state }}"
+    namespace: '{{ ansible_operator_meta.namespace }}'
+    definition: "{{ lookup('template', 'alerta-webaddon-service.yaml.j2') | from_yaml }}"
+
+- name: manage Alerta webaddon ingress
+  community.kubernetes.k8s:
+    state: "{{ state }}"
+    namespace: '{{ ansible_operator_meta.namespace }}'
+    definition: "{{ lookup('template', 'alerta-webaddon-ingress.yaml.j2') | from_yaml }}"

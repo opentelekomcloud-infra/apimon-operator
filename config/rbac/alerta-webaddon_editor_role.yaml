@@ -1,0 +1,24 @@
+# permissions for end users to edit alerta-webaddons.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: alerta-webaddon-editor-role
+rules:
+- apiGroups:
+  - apimon.otc-service.com
+  resources:
+  - alerta-webaddons
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apimon.otc-service.com
+  resources:
+  - alerta-webaddons/status
+  verbs:
+  - get

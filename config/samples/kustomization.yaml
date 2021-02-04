@@ -2,4 +2,5 @@
 resources:
 - apimon_v1alpha1_grafana.yaml
 - apimon_v1alpha1_alerta.yaml
+- apimon_v1alpha1_alerta-webaddon.yaml
 # +kubebuilder:scaffold:manifestskustomizesamples

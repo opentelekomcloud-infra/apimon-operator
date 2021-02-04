@@ -8,4 +8,8 @@
   group: apimon.otc-service.com
   kind: Alerta
   role: alerta
+- version: v1alpha1
+  group: apimon.otc-service.com
+  kind: Alerta-webaddon
+  role: alerta-webaddon
 # +kubebuilder:scaffold:watch

@@ -8,4 +8,7 @@ resources:
 - group: apimon
   kind: Alerta
   version: v1alpha1
+- group: apimon
+  kind: Alerta-webaddon
+  version: v1alpha1
 version: 3-alpha

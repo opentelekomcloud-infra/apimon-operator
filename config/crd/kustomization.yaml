@@ -4,4 +4,5 @@
 resources:
 - bases/apimon.otc-service.com_grafanas.yaml
 - bases/apimon.otc-service.com_alerta.yaml
+- bases/apimon.otc-service.com_alerta-webaddons.yaml
 # +kubebuilder:scaffold:crdkustomizeresource

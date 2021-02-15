@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  annotations: 
+    config_revision : "{{ config_revision }}"
+  labels:
+    run: "{{ name }}"
+  name: "{{ name }}"
+spec:
+  replicas: {{ replicas }}
+  selector:
+    matchLabels:
+      run: "{{ name }}"
+  strategy: {}
+  template:
+    metadata:
+      annotations: 
+        config_revision : "{{ config_revision }}"
+      creationTimestamp: null
+      labels:
+        run: "{{ name }}"
+    spec:
+      hostAliases:
+{% if ldap_server_ip is defined and ldap_server_ip|length and 
+      ldap_server_name is defined and ldap_server_name|length %}
+      - ip: "{{ ldap_server_ip }}"
+        hostnames:
+        - "{{ ldap_server_name }}"
+{% endif %}
+      - ip: "127.0.0.1"
+        hostnames:
+        - "{{ fqdn }}"
+      containers:
+      - image: "{{ renderer_image }}" 
+        name: "{{ name }}-renderer"
+        ports:
+        - containerPort: 8081
+        resources:
+          limits:
+            cpu: 500m
+            memory: 500Mi
+      - image: "{{ image }}"
+        name: "{{ name }}"
+        ports:
+        - containerPort: 3000
+        resources:
+          limits:
+            cpu: 500m
+            memory: 500Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        readinessProbe:
+          httpGet:
+            path: /login
+            scheme: HTTP
+            port: 3000
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            scheme: HTTP
+            port: 3000
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: run
+                    operator: In
+                    values:
+                    - "{{ name }}"
+                topologyKey: kubernetes.io/hostname
+        env:
+          - name: GF_RENDERING_SERVER_URL
+            value: http://localhost:8081/render
+          - name: GF_RENDERING_CALLBACK_URL
+            value: http://{{ fqdn }}:3000
+          - name: GF_INSTALL_PLUGINS
+            value: "{{ plugins }}"
+{% if grafana_secret_exists is defined and grafana_secret_exists|length %}
+        envFrom:
+        - secretRef:
+            name: {{ secret }}
+{% endif %}
+        volumeMounts:
+{% if grafana_config_exists is defined and grafana_config_exists|length %}
+        - name: grafana-config
+          mountPath: /etc/grafana/grafana.ini
+          subPath: grafana.ini
+{% endif %}
+{% if grafana_config_ldap_exists is defined and grafana_config_ldap_exists|length %}
+        - name: grafana-config-ldap
+          mountPath: /etc/grafana/ldap.toml
+          subPath: ldap.toml
+{% endif %}
+{% if grafana_config_ldap_ca_cert_exists is defined and grafana_config_ldap_ca_cert_exists|length %}
+        - name: grafana-config-ldap-ca-cert
+          mountPath: /etc/grafana/ldap-root-ca-cert.crt
+          subPath: ldap-root-ca-cert.crt
+{% endif %}
+      volumes:
+{% if grafana_config_exists is defined and grafana_config_exists|length %}
+      - configMap:
+          name: "{{ config }}"
+        name: grafana-config
+{% endif %}
+{% if grafana_config_ldap_exists is defined and grafana_config_ldap_exists|length %}
+      - configMap:
+          name: "{{ config_ldap }}"
+        name: grafana-config-ldap
+{% endif %}
+{% if grafana_config_ldap_ca_cert_exists is defined and grafana_config_ldap_ca_cert_exists|length %}
+      - configMap:
+          name: "{{ config_ldap_ca_cert }}"
+        name: grafana-config-ldap-ca-cert
+{% endif %}
+status: {}

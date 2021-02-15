@@ -1,0 +1,19 @@
+---
+# Use the 'create api' subcommand to add watches to this file.
+- version: v1alpha1
+  group: apimon.otc-service.com
+  kind: Grafana
+  role: grafana
+- version: v1alpha1
+  group: apimon.otc-service.com
+  kind: Alerta
+  role: alerta
+- version: v1alpha1
+  group: apimon.otc-service.com
+  kind: Alerta-webaddon
+  role: alerta-webaddon
+- version: v1alpha1
+  group: apimon.otc-service.com
+  kind: Apimon
+  role: apimon
+# +kubebuilder:scaffold:watch

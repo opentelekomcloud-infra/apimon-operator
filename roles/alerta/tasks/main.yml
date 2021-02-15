@@ -1,0 +1,23 @@
+---
+- name: Get config status 
+  set_fact:
+    alerta_secret_exists: "{{ lookup('k8s', api_version='v1', kind='Secret', namespace=ansible_operator_meta.namespace, resource_name=secret) }}"
+    alerta_config_exists: "{{ lookup('k8s', api_version='v1', kind='ConfigMap', namespace=ansible_operator_meta.namespace, resource_name=config) }}"
+
+- name: start Alerta deployment 
+  community.kubernetes.k8s:
+    state: "{{ state }}"
+    namespace: '{{ ansible_operator_meta.namespace }}'
+    definition: "{{ lookup('template', 'alerta-deployment.yaml.j2') | from_yaml }}"
+
+- name: expose Alerta deployment with service
+  community.kubernetes.k8s:
+    state: "{{ state }}"
+    namespace: '{{ ansible_operator_meta.namespace }}'
+    definition: "{{ lookup('template', 'alerta-service.yaml.j2') | from_yaml }}"
+
+- name: manage Alerta ingress
+  community.kubernetes.k8s:
+    state: "{{ state }}"
+    namespace: '{{ ansible_operator_meta.namespace }}'
+    definition: "{{ lookup('template', 'alerta-ingress.yaml.j2') | from_yaml }}"

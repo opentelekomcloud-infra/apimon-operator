@@ -1,0 +1,117 @@
+---
+- name: Manage StatsD config
+  community.kubernetes.k8s:
+    state: "{{ state }}"
+    namespace: "{{ namespace }}"
+    name: "{{ statsd_cm_name }}"
+    kind: "ConfigMap"
+    api_version: "v1"
+    definition:
+      metadata:
+        labels:
+          app.kubernetes.io/name: "apimon"
+          app.kubernetes.io/component: "statsd"
+          app.kubernetes.io/instance: "{{ instance }}"
+          app.kubernetes.io/managed-by: "operator"
+      data:
+        config.js: "{{ statsd_config }}"
+
+- name: Manage StatsD Service
+  community.kubernetes.k8s:
+    state: "{{ state }}"
+    name: "{{ statsd_svc_name }}"
+    namespace: "{{ namespace }}"
+    api_version: "v1"
+    kind: "Service"
+    apply: "yes"
+    definition:
+      metadata:
+        labels:
+          app.kubernetes.io/name: "apimon"
+          app.kubernetes.io/component: "statsd"
+          app.kubernetes.io/instance: "{{ instance }}"
+          app.kubernetes.io/managed-by: "operator"
+      spec:
+        type: ClusterIP
+        ports:
+          - name: "statsd-udp"
+            port: 8125
+            protocol: "UDP"
+          - name: "statsd-tcp"
+            port: 8125
+            protocol: "TCP"
+          - name: "statsd-admin"
+            port: 8126
+            protocol: "TCP"
+        selector:
+          app.kubernetes.io/name: "apimon"
+          app.kubernetes.io/component: "statsd"
+          app.kubernetes.io/instance: "{{ instance }}"
+
+- name: Manage StatsD StatefulSet
+  community.kubernetes.k8s:
+    state: "{{ state }}"
+    namespace: "{{ namespace }}"
+    name: "{{ statsd_ss_name }}"
+    kind: "Deployment"
+    api_version: "apps/v1"
+    apply: "yes"
+    definition:
+      metadata:
+        labels:
+          app.kubernetes.io/name: "apimon"
+          app.kubernetes.io/component: "statsd"
+          app.kubernetes.io/instance: "{{ instance }}"
+          app.kubernetes.io/managed-by: "operator"
+      spec:
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: "apimon"
+            app.kubernetes.io/component: "statsd"
+            app.kubernetes.io/instance: "{{ instance }}"
+        serviceName: "{{ statsd_svc_name }}"
+        replicas: 1
+        template:
+          metadata:
+            labels:
+              app.kubernetes.io/name: "apimon"
+              app.kubernetes.io/component: "statsd"
+              app.kubernetes.io/instance: "{{ instance }}"
+          spec:
+            containers:
+              - resources: "{{ statsd_resources | default(omit) }}"
+                readinessProbe:
+                  tcpSocket:
+                    port: "statsd-admin"
+                  timeoutSeconds: "{{ statsd_readiness_timeout }}"
+                  initialDelaySeconds: 5
+                livenessProbe:
+                  tcpSocket:
+                    port: "statsd-admin"
+                  timeoutSeconds: "{{ statsd_liveness_timeout }}"
+                  initialDelaySeconds: 5
+                name: "statsd"
+                command:
+                  - "node"
+                  - "/usr/src/app/stats.js"
+                  - "/usr/src/app/conf/config.js"
+                ports:
+                  - name: "statsd-udp"
+                    containerPort: 8125
+                    protocol: "UDP"
+                  - name: "statsd-tcp"
+                    containerPort: 8125
+                    protocol: "TCP"
+                  - name: "statsd-admin"
+                    containerPort: 8126
+                    protocol: "TCP"
+                imagePullPolicy: "IfNotPresent"
+                volumeMounts:
+                  - name: "statsd-configmap"
+                    mountPath: "/usr/src/app/conf"
+                image: "{{ statsd_image }}"
+            volumes:
+              - name: "statsd-configmap"
+                configMap:
+                  name: "{{ statsd_cm_name }}"
+                  defaultMode: 420

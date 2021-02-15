@@ -1,0 +1,24 @@
+# permissions for end users to edit apimons.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: apimon-editor-role
+rules:
+- apiGroups:
+  - apimon.otc-service.com
+  resources:
+  - apimons
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apimon.otc-service.com
+  resources:
+  - apimons/status
+  verbs:
+  - get

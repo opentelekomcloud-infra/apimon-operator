@@ -1,0 +1,24 @@
+# permissions for end users to edit alerta.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: alerta-editor-role
+rules:
+- apiGroups:
+  - apimon.otc-service.com
+  resources:
+  - alerta
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apimon.otc-service.com
+  resources:
+  - alerta/status
+  verbs:
+  - get

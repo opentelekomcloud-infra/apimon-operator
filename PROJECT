@@ -1,0 +1,20 @@
+domain: otc-service.com
+layout: ansible.sdk.operatorframework.io/v1
+plugins:
+  manifests.sdk.operatorframework.io/v2: {}
+  scorecard.sdk.operatorframework.io/v2: {}
+projectName: apimon-operator
+resources:
+- group: apimon
+  kind: Grafana
+  version: v1alpha1
+- group: apimon
+  kind: Alerta
+  version: v1alpha1
+- group: apimon
+  kind: Alerta-webaddon
+  version: v1alpha1
+- group: apimon
+  kind: Apimon
+  version: v1alpha1
+version: 3-alpha

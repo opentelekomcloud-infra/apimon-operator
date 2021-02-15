@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    # add an annotation indicating the issuer to use.
+    route.openshift.io/termination: "edge"
+{% if cluster_issuer is defined and cluster_issuer|length %}
+    cert-manager.io/cluster-issuer: "{{ cluster_issuer }}"
+{% endif %}
+  name: "{{ name }}-ingress"
+spec:
+  rules:
+  - host: "{{ fqdn }}"
+    http:
+      paths:
+      - backend:
+          serviceName: "{{ name }}"
+          servicePort: 3000
+        path: /
+{% if ssl_cert  is defined and ssl_cert|length %}
+  tls: 
+  - hosts:
+    - "{{ fqdn }}"
+    secretName: "{{ ssl_cert }}"
+{% endif %}

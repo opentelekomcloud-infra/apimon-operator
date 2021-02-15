@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  annotations: 
+    config_revision : "{{ config_revision }}"
+  labels:
+    run: "{{ name }}"
+  name: "{{ name }}"
+spec:
+  replicas: {{ replicas }}
+  selector:
+    matchLabels:
+      run: "{{ name }}"
+  strategy: {}
+  template:
+    metadata:
+      annotations: 
+        config_revision : "{{ config_revision }}"
+      creationTimestamp: null
+      labels:
+        run: "{{ name }}"
+    spec:
+      containers:
+      - image: "{{ image }}"
+        name: "{{ name }}"
+        ports:
+        - containerPort: 23456
+        resources:
+          limits:
+            cpu: 500m
+            memory: 500Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: run
+                    operator: In
+                    values:
+                    - "{{ name }}"
+                topologyKey: kubernetes.io/hostname
+{% if alerta_webaddon_secret_exists is defined and alerta_webaddon_secret_exists|length %}
+        envFrom:
+        - secretRef:
+            name: {{ secret }}
+{% endif %}
+status: {}

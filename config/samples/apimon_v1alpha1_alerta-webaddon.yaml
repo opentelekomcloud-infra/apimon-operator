@@ -1,0 +1,6 @@
+apiVersion: apimon.otc-service.com/v1alpha1
+kind: Alerta-webaddon
+metadata:
+  name: alerta-webaddon-sample
+spec:
+  foo: bar

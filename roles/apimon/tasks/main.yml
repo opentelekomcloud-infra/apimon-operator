@@ -1,0 +1,9 @@
+---
+# tasks file for Apimon
+
+- include_tasks: statsd_server.yaml
+  when: statsd_enable
+- include_tasks: epmon.yaml
+- include_tasks: scheduler.yaml
+- include_tasks: executor.yaml
+

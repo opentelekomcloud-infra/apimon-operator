@@ -95,4 +95,21 @@ rules:
       - patch
       - update
       - watch
+  ##
+  ## Rules for apimon.otc-service.com/v1alpha1, Kind: Apimon
+  ##
+  - apiGroups:
+      - apimon.otc-service.com
+    resources:
+      - apimons
+      - apimons/status
+      - apimons/finalizers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
 # +kubebuilder:scaffold:rules

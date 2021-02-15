@@ -1,0 +1,6 @@
+apiVersion: apimon.otc-service.com/v1alpha1
+kind: Apimon
+metadata:
+  name: apimon-sample
+spec:
+  foo: bar

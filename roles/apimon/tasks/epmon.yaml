@@ -1,0 +1,82 @@
+---
+- name: Manage StatsD-repeater config
+  community.kubernetes.k8s:
+    state: "{{ state }}"
+    namespace: "{{ namespace }}"
+    name: "{{ statsd_repeater_cm_name }}"
+    kind: "ConfigMap"
+    api_version: "v1"
+    definition:
+      metadata:
+        labels:
+          app.kubernetes.io/name: "apimon"
+          app.kubernetes.io/component: "statsd-repeater"
+          app.kubernetes.io/instance: "{{ instance }}"
+          app.kubernetes.io/managed-by: "operator"
+      data:
+        config.js: "{{ statsd_repeater_config }}"
+
+- name: Manage epmon deployment
+  community.kubernetes.k8s:
+    state: "{{ state }}"
+    namespace: "{{ namespace }}"
+    name: "{{ epmon_ss_name }}"
+    api_version: "apps/v1"
+    kind: "Deployment"
+    apply: "yes"
+    definition:
+      metadata:
+        labels:
+          app.kubernetes.io/name: "apimon"
+          app.kubernetes.io/component: "apimon-epmon"
+          app.kubernetes.io/instance: "{{ instance }}"
+          app.kubernetes.io/managed-by: "operator"
+      spec:
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: "apimon"
+            app.kubernetes.io/component: "apimon-epmon"
+            app.kubernetes.io/instance: "{{ instance }}"
+        replicas: "{{ epmon_count }}"
+        template:
+          metadata:
+            labels:
+              app.kubernetes.io/name: "apimon"
+              app.kubernetes.io/component: "apimon-epmon"
+              app.kubernetes.io/instance: "{{ instance }}"
+          spec:
+            containers:
+              - name: "epmon"
+                image: "{{ epmon_image }}"
+                imagePullPolicy: "{{ epmon_image_pull_policy }}"
+                command:
+                  - "epmon"
+                resources: "{{ epmon_resources | default(omit) }}"
+                volumeMounts:
+                  - name: "apimon-config"
+                    mountPath: "{{ config_location }}"
+                  - name: "apimon-secure"
+                    mountPath: "{{ config_secure_location }}"
+              - name: "statsd-repeater"
+                image: "{{ statsd_repeater_image }}"
+                imagePullPolicy: "{{ statsd_repeater_image_pull_policy | default(omit) }}"
+                command:
+                  - "node"
+                  - "/usr/src/app/stats.js"
+                  - "/usr/src/app/conf/config.js"
+                resources: "{{ statsd_repeater_resources | default(omit) }}"
+                volumeMounts:
+                  - name: "apimon-statsd"
+                    mountPath: "/usr/src/app/conf/"
+            volumes:
+            - name: "apimon-config"
+              configMap:
+                name: "{{ config_map_name }}"
+                defaultMode: 420
+            - name: "apimon-secure"
+              secret:
+                secretName: "{{ secret_name }}"
+            - name: "apimon-statsd"
+              configMap:
+                name: "{{ statsd_repeater_cm_name }}"
+                defaultMode: 420

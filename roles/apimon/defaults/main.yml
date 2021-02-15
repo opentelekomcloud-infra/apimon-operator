@@ -1,0 +1,75 @@
+---
+# defaults file for Apimon
+#
+state: "present"
+namespace: "{{ ansible_operator_meta.namespace }}"
+instance: "apimon-{{ ansible_operator_meta.name }}"
+
+config_map_name: "apimon-config"
+secret_name: "apimon-secure"
+
+apimon_image: "quay.io/opentelekomcloud/apimon:dev"
+apimon_image_pull_policy: "IfNotPresent"
+
+config_location: "/etc/apimon"
+config_secure_location: "/etc/apimon_secure"
+
+epmon_ss_name: "apimon-epmon-{{ ansible_operator_meta.name }}"
+epmon_count: 1
+epmon_image: "{{ apimon_image }}"
+epmon_image_pull_policy: "{{ apimon_image_pull_policy }}"
+epmon_resources:
+  limits:
+    cpu: 500m
+    memory: 500Mi
+
+scheduler_svc_name: "apimon-scheduler-{{ ansible_operator_meta.name }}"
+scheduler_ss_name: "apimon-scheduler-{{ ansible_operator_meta.name }}"
+scheduler_count: 1
+scheduler_image: "{{ apimon_image }}"
+scheduler_image_pull_policy: "{{ apimon_image_pull_policy }}"
+scheduler_resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+executor_svc_name: "apimon-executor-{{ ansible_operator_meta.name }}"
+executor_ss_name: "apimon-executor-{{ ansible_operator_meta.name }}"
+executor_count: 2
+executor_image: "{{ apimon_image }}"
+executor_image_pull_policy: "{{ apimon_image_pull_policy }}"
+executor_resources:
+  requests:
+    cpu: 1
+    memory: 1G
+  limits:
+    cpu: 2
+    memory: 4G
+
+# apimon_statsd_repeater_enable: True
+statsd_repeater_cm_name: "apimon-statsd-repeater-{{ ansible_operator_meta.name }}"
+statsd_repeater_image: "quay.io/opentelekomcloud/statsd:v0.9.0"
+statsd_repeater_image_pull_policy: "IfNotPresent"
+statsd_repeater_resources:
+  requests:
+    cpu: 50m
+    memory: 32Mi
+statsd_repeater_config: "{{ lookup('template', 'statsd-repeater-config.js.j2') }}"
+
+statsd_enable: true
+statsd_svc_name: "apimon-statsd-{{ ansible_operator_meta.name }}"
+statsd_ss_name: "apimon-statsd-{{ ansible_operator_meta.name }}"
+statsd_cm_name: "apimon-statsd-config-{{ ansible_operator_meta.name }}"
+statsd_image: "quay.io/opentelekomcloud/statsd:v0.9.0"
+statsd_image_pull_policy: "IfNotPresent"
+statsd_resources:
+  requests:
+    cpu: 50m
+    memory: 32Mi
+statsd_readiness_timeout: 5
+statsd_liveness_timeout: 2
+statsd_config: "{{ lookup('template', 'statsd-config.js.j2') }}"
+

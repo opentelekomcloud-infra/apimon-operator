@@ -5,13 +5,18 @@ metadata:
   annotations: 
     config_revision : "{{ config_revision }}"
   labels:
-    run: "{{ name }}"
+    app.kubernetes.io/name: "alerta-webaddon"
+    app.kubernetes.io/component: "management"
+    app.kubernetes.io/instance: "{{ instance }}"
+    app.kubernetes.io/managed-by: "operator"
   name: "{{ name }}"
 spec:
-  replicas: {{ replicas }}
+  replicas: {{ count }}
   selector:
     matchLabels:
-      run: "{{ name }}"
+      app.kubernetes.io/name: "alerta-webaddon"
+      app.kubernetes.io/component: "management"
+      app.kubernetes.io/instance: "{{ instance }}"
   strategy: {}
   template:
     metadata:
@@ -19,20 +24,16 @@ spec:
         config_revision : "{{ config_revision }}"
       creationTimestamp: null
       labels:
-        run: "{{ name }}"
+        app.kubernetes.io/name: "alerta-webaddon"
+        app.kubernetes.io/component: "management"
+        app.kubernetes.io/instance: "{{ instance }}"
     spec:
       containers:
       - image: "{{ image }}"
         name: "{{ name }}"
         ports:
         - containerPort: 23456
-        resources:
-          limits:
-            cpu: 500m
-            memory: 500Mi
-          requests:
-            cpu: 100m
-            memory: 100Mi
+        resources: "{{ resources | default(omit) }}"
         affinity:
           podAntiAffinity:
             preferredDuringSchedulingIgnoredDuringExecution:

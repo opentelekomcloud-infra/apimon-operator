@@ -1,11 +1,21 @@
 ---
-# defaults file for Grafana
+# defaults file for Alerta-webaddon
 state: present
-name: apimon-alerta-webaddon
+name: "apimon-{{ ansible_operator_meta.name }}"
+instance: "{{ name }}"
 config_revision: 0
-replicas: 1
+count: 1
 image: quay.io/opentelekomcloud/alerta-webaddon
+
 secret: alerta-webaddon-secret
 fqdn: alerta-webaddon.apimon.otc-service.com
 cluster_issuer: ''
 ssl_cert: ''
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 500Mi
+  requests:
+    cpu: 100m
+    memory: 100Mi

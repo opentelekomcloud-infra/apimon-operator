@@ -5,13 +5,18 @@ metadata:
   annotations: 
     config_revision : "{{ config_revision }}"
   labels:
-    run: "{{ name }}"
+    app.kubernetes.io/name: "grafana"
+    app.kubernetes.io/component: "dashboard"
+    app.kubernetes.io/instance: "{{ instance }}"
+    app.kubernetes.io/managed-by: "operator"
   name: "{{ name }}"
 spec:
-  replicas: {{ replicas }}
+  replicas: {{ count }}
   selector:
     matchLabels:
-      run: "{{ name }}"
+      app.kubernetes.io/name: "grafana"
+      app.kubernetes.io/component: "dashboard"
+      app.kubernetes.io/instance: "{{ instance }}"
   strategy: {}
   template:
     metadata:
@@ -19,7 +24,9 @@ spec:
         config_revision : "{{ config_revision }}"
       creationTimestamp: null
       labels:
-        run: "{{ name }}"
+        app.kubernetes.io/name: "grafana"
+        app.kubernetes.io/component: "dashboard"
+        app.kubernetes.io/instance: "{{ instance }}"
     spec:
       hostAliases:
 {% if ldap_server_ip is defined and ldap_server_ip|length and 
@@ -36,21 +43,12 @@ spec:
         name: "{{ name }}-renderer"
         ports:
         - containerPort: 8081
-        resources:
-          limits:
-            cpu: 500m
-            memory: 500Mi
+        resources: "{{ renderer_resources | default(omit) }}"
       - image: "{{ image }}"
         name: "{{ name }}"
         ports:
         - containerPort: 3000
-        resources:
-          limits:
-            cpu: 500m
-            memory: 500Mi
-          requests:
-            cpu: 100m
-            memory: 100Mi
+        resources: "{{ resources | default(omit) }}"
         readinessProbe:
           httpGet:
             path: /login

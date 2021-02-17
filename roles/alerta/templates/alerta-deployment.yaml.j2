@@ -5,13 +5,19 @@ metadata:
   annotations: 
     config_revision : "{{ config_revision }}"
   labels:
+    app.kubernetes.io/name: "alerta"
+    app.kubernetes.io/component: "monitoring"
+    app.kubernetes.io/instance: "{{ instance }}"
+    app.kubernetes.io/managed-by: "operator"
     run: "{{ name }}"
   name: "{{ name }}"
 spec:
-  replicas: {{ replicas }}
+  replicas: {{ count }}
   selector:
     matchLabels:
-      run: "{{ name }}"
+      app.kubernetes.io/name: "alerta"
+      app.kubernetes.io/component: "monitoring"
+      app.kubernetes.io/instance: "{{ instance }}"
   strategy: {}
   template:
     metadata:
@@ -19,7 +25,9 @@ spec:
         config_revision : "{{ config_revision }}"
       creationTimestamp: null
       labels:
-        run: "{{ name }}"
+        app.kubernetes.io/name: "alerta"
+        app.kubernetes.io/component: "monitoring"
+        app.kubernetes.io/instance: "{{ instance }}"
     spec:
       hostAliases:
 {% if ldap_server_ip is defined and ldap_server_ip|length and 
@@ -33,13 +41,7 @@ spec:
         name: "{{ name }}"
         ports:
         - containerPort: 8080
-        resources:
-          limits:
-            cpu: 500m
-            memory: 500Mi
-          requests:
-            cpu: 100m
-            memory: 100Mi
+        resources: "{{ resources | default(omit) }}"
         readinessProbe:
           httpGet:
             path: /login

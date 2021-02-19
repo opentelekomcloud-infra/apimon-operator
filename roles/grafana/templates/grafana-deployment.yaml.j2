@@ -43,12 +43,28 @@ spec:
         name: "{{ name }}-renderer"
         ports:
         - containerPort: 8081
-        resources: "{{ renderer_resources | default(omit) }}"
+{% if renderer_resources is defined and renderer_resources|length %}
+        resources:
+{% for key, value in renderer_resources.items() %}
+          {{ key }}:
+{% for key2, value2 in value.items() %}
+            {{ key2 }}: {{ value2 }}
+{% endfor %}
+{% endfor %}
+{% endif %}
       - image: "{{ image }}"
         name: "{{ name }}"
         ports:
         - containerPort: 3000
-        resources: "{{ resources | default(omit) }}"
+{% if resources is defined and resources|length %}
+        resources:
+{% for key, value in resources.items() %}
+          {{ key }}:
+{% for key2, value2 in value.items() %}
+            {{ key2 }}: {{ value2 }}
+{% endfor %}
+{% endfor %}
+{% endif %}
         readinessProbe:
           httpGet:
             path: /login

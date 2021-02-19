@@ -41,7 +41,15 @@ spec:
         name: "{{ name }}"
         ports:
         - containerPort: 8080
-        resources: "{{ resources | default(omit) }}"
+{% if resources is defined and resources|length %}
+        resources:
+{% for key, value in resources.items() %}
+          {{ key }}:
+{% for key2, value2 in value.items() %}
+            {{ key2 }}: {{ value2 }}
+{% endfor %}
+{% endfor %}
+{% endif %}
         readinessProbe:
           httpGet:
             path: /login

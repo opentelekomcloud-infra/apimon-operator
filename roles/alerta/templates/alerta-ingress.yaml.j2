@@ -1,6 +1,11 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  lablels:
+    app.kubernetes.io/name: "alerta"
+    app.kubernetes.io/component: "monitoring"
+    app.kubernetes.io/instance: "{{ instance }}"
+    app.kubernetes.io/managed-by: "operator"
   annotations:
     # add an annotation indicating the issuer to use.
     route.openshift.io/termination: "edge"

@@ -9,7 +9,6 @@ metadata:
     app.kubernetes.io/component: "monitoring"
     app.kubernetes.io/instance: "{{ instance }}"
     app.kubernetes.io/managed-by: "operator"
-    run: "{{ name }}"
   name: "{{ name }}"
 spec:
   replicas: {{ count }}

@@ -19,9 +19,12 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: "{{ name }}"
-          servicePort: 23456
+          service:
+            name: "{{ name }}"
+            port: 
+              number: 23456
         path: /webaddon
+        pathType: Prefix
 {% if ssl_cert  is defined and ssl_cert|length %}
   tls: 
   - hosts:

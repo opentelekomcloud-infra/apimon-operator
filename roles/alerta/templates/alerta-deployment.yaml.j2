@@ -35,6 +35,18 @@ spec:
         hostnames:
         - "{{ ldap_server_name }}"
 {% endif %}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: "app.kubernetes.io/instance"
+                  operator: In
+                  values:
+                  - "{{ instance }}"
+              topologyKey: kubernetes.io/hostname
       containers:
       - image: "{{ image }}"
         name: "{{ name }}"
@@ -59,18 +71,6 @@ spec:
             path: /login
             scheme: HTTP
             port: 8080
-        affinity:
-          podAntiAffinity:
-            preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                  - key: run
-                    operator: In
-                    values:
-                    - "{{ name }}"
-                topologyKey: kubernetes.io/hostname
 {% if alerta_secret_exists is defined and alerta_secret_exists|length %}
         envFrom:
         - secretRef:

@@ -28,6 +28,18 @@ spec:
         app.kubernetes.io/component: "management"
         app.kubernetes.io/instance: "{{ instance }}"
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: "app.kubernetes.io/instance"
+                  operator: In
+                  values:
+                  - "{{ instance }}"
+              topologyKey: kubernetes.io/hostname
       containers:
       - image: "{{ image }}"
         name: "{{ name }}"
@@ -42,18 +54,6 @@ spec:
 {% endfor %}
 {% endfor %}
 {% endif %}
-        affinity:
-          podAntiAffinity:
-            preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                  - key: run
-                    operator: In
-                    values:
-                    - "{{ name }}"
-                topologyKey: kubernetes.io/hostname
 {% if alerta_webaddon_secret_exists is defined and alerta_webaddon_secret_exists|length %}
         envFrom:
         - secretRef:

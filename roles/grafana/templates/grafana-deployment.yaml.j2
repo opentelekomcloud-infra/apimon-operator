@@ -38,6 +38,18 @@ spec:
       - ip: "127.0.0.1"
         hostnames:
         - "{{ fqdn }}"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: "app.kubernetes.io/instance"
+                  operator: In
+                  values:
+                  - "{{ instance }}"
+              topologyKey: kubernetes.io/hostname
       containers:
       - image: "{{ renderer_image }}" 
         name: "{{ name }}-renderer"
@@ -75,18 +87,6 @@ spec:
             path: /healthz
             scheme: HTTP
             port: 3000
-        affinity:
-          podAntiAffinity:
-            preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                  - key: run
-                    operator: In
-                    values:
-                    - "{{ name }}"
-                topologyKey: kubernetes.io/hostname
         env:
           - name: GF_RENDERING_SERVER_URL
             value: http://localhost:8081/render

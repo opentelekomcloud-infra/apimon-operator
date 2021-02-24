@@ -27,6 +27,33 @@ spec:
             type: object
           spec:
             description: Spec defines the desired state of Grafana
+            properties:
+              config:
+                description: ConfigMap name with grafana.ini configuration file
+                type: string
+              count:
+                description: Count of Grafana PODs
+                format: int32
+                minimum: 1
+                type: integer
+              fqdn:
+                description: FQDN of the Granana instance
+                type: string
+              image:
+                description: Grafana Image to use
+                type: string
+              plugins:
+                description: List of Grafana plugins to be installed separated with comma
+                type: string
+              renderer_image:
+                description: Grafana Renderer Image to use
+                type: string
+              secret:
+                description: Secret name with ENV variables mounted during runtime
+                type: string
+              ssl_cert:
+                description: Secret name with TLS certificate for https connection
+                type: string
             type: object
             x-kubernetes-preserve-unknown-fields: true
           status:

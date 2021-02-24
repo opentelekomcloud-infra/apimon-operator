@@ -1,6 +1,11 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  labels:
+    app.kubernetes.io/name: "alerta"
+    app.kubernetes.io/component: "monitoring"
+    app.kubernetes.io/instance: "{{ instance }}"
+    app.kubernetes.io/managed-by: "operator"
   annotations:
     # add an annotation indicating the issuer to use.
     route.openshift.io/termination: "edge"
@@ -14,9 +19,12 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: "{{ name }}"
-          servicePort: 8080
+          service:
+            name: "{{ name }}"
+            port: 
+              number: 8080
         path: /
+        pathType: Prefix
 {% if ssl_cert  is defined and ssl_cert|length %}
   tls: 
   - hosts:

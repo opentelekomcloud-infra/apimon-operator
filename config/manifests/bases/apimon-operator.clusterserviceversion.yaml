@@ -6,7 +6,7 @@ metadata:
     capabilities: Seamless Upgrades
     operators.operatorframework.io/builder: operator-sdk-v1.4.0
     operators.operatorframework.io/project_layout: ansible.sdk.operatorframework.io/v1
-  name: apimon-operator.v0.1.7
+  name: apimon-operator.v0.1.8
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -47,5 +47,5 @@ spec:
   maturity: alpha
   provider:
     name: Open Telekom Cloud
-  replaces: apimon-operator.v0.1.6
-  version: 0.1.7
+  replaces: apimon-operator.v0.1.7
+  version: 0.1.8

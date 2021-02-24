@@ -33,6 +33,24 @@ spec:
             description: Spec defines the desired state of Alerta-webaddon
             type: object
             x-kubernetes-preserve-unknown-fields: true
+            properties:
+              image:
+                description: Grafana Image to use
+                type: string
+              count:
+                description: Count of Alerta-webaddon PODs
+                type: integer
+                format: int32
+                minimum: 1
+              fqdn:
+                description: FQDN of the Alerta-webaddon instance
+                type: string
+              secret:
+                description: Secret name with ENV variables mounted during runtime
+                type: string
+              ssl_cert:
+                description: Secret name with TLS certificate for https connection
+                type: string
           status:
             description: Status defines the observed state of Alerta-webaddon
             type: object

@@ -5,13 +5,18 @@ metadata:
   annotations: 
     config_revision : "{{ config_revision }}"
   labels:
-    run: "{{ name }}"
+    app.kubernetes.io/name: "alerta"
+    app.kubernetes.io/component: "monitoring"
+    app.kubernetes.io/instance: "{{ instance }}"
+    app.kubernetes.io/managed-by: "operator"
   name: "{{ name }}"
 spec:
-  replicas: {{ replicas }}
+  replicas: {{ count }}
   selector:
     matchLabels:
-      run: "{{ name }}"
+      app.kubernetes.io/name: "alerta"
+      app.kubernetes.io/component: "monitoring"
+      app.kubernetes.io/instance: "{{ instance }}"
   strategy: {}
   template:
     metadata:
@@ -19,7 +24,9 @@ spec:
         config_revision : "{{ config_revision }}"
       creationTimestamp: null
       labels:
-        run: "{{ name }}"
+        app.kubernetes.io/name: "alerta"
+        app.kubernetes.io/component: "monitoring"
+        app.kubernetes.io/instance: "{{ instance }}"
     spec:
       hostAliases:
 {% if ldap_server_ip is defined and ldap_server_ip|length and 
@@ -28,18 +35,32 @@ spec:
         hostnames:
         - "{{ ldap_server_name }}"
 {% endif %}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: "app.kubernetes.io/instance"
+                  operator: In
+                  values:
+                  - "{{ instance }}"
+              topologyKey: kubernetes.io/hostname
       containers:
       - image: "{{ image }}"
         name: "{{ name }}"
         ports:
         - containerPort: 8080
+{% if resources is defined and resources|length %}
         resources:
-          limits:
-            cpu: 500m
-            memory: 500Mi
-          requests:
-            cpu: 100m
-            memory: 100Mi
+{% for key, value in resources.items() %}
+          {{ key }}:
+{% for key2, value2 in value.items() %}
+            {{ key2 }}: {{ value2 }}
+{% endfor %}
+{% endfor %}
+{% endif %}
         readinessProbe:
           httpGet:
             path: /login
@@ -50,18 +71,6 @@ spec:
             path: /login
             scheme: HTTP
             port: 8080
-        affinity:
-          podAntiAffinity:
-            preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                  - key: run
-                    operator: In
-                    values:
-                    - "{{ name }}"
-                topologyKey: kubernetes.io/hostname
 {% if alerta_secret_exists is defined and alerta_secret_exists|length %}
         envFrom:
         - secretRef:

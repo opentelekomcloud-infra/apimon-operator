@@ -27,6 +27,27 @@ spec:
             type: object
           spec:
             description: Spec defines the desired state of Alerta
+            properties:
+              config:
+                description: ConfigMap name with alertad.conf configuration file
+                type: string
+              count:
+                description: Count of Alerta PODs
+                format: int32
+                minimum: 1
+                type: integer
+              fqdn:
+                description: FQDN of the Alerta instance
+                type: string
+              image:
+                description: Alerta Image to use
+                type: string
+              secret:
+                description: Secret name with ENV variables mounted during runtime
+                type: string
+              ssl_cert:
+                description: Secret name with TLS certificate for https connection
+                type: string
             type: object
             x-kubernetes-preserve-unknown-fields: true
           status:

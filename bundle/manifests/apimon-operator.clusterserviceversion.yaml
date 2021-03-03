@@ -48,7 +48,7 @@ metadata:
     capabilities: Seamless Upgrades
     operators.operatorframework.io/builder: operator-sdk-v1.4.2
     operators.operatorframework.io/project_layout: ansible.sdk.operatorframework.io/v1
-  name: apimon-operator.v0.1.8
+  name: apimon-operator.v0.1.9
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -180,7 +180,7 @@ spec:
           - subjectaccessreviews
           verbs:
           - create
-        serviceAccountName: default
+        serviceAccountName: apimon-operator-apimon-operator
       deployments:
       - name: apimon-operator-controller-manager
         spec:
@@ -213,7 +213,7 @@ spec:
                 env:
                 - name: ANSIBLE_GATHERING
                   value: explicit
-                image: quay.io/opentelekomcloud/apimon-operator:0.1.8
+                image: quay.io/opentelekomcloud/apimon-operator:0.1.9
                 livenessProbe:
                   httpGet:
                     path: /readyz
@@ -228,6 +228,7 @@ spec:
                   initialDelaySeconds: 5
                   periodSeconds: 10
                 resources: {}
+              serviceAccountName: apimon-operator-apimon-operator
               terminationGracePeriodSeconds: 10
       permissions:
       - rules:
@@ -250,7 +251,7 @@ spec:
           verbs:
           - create
           - patch
-        serviceAccountName: default
+        serviceAccountName: apimon-operator-apimon-operator
     strategy: deployment
   installModes:
   - supported: false
@@ -279,5 +280,5 @@ spec:
   maturity: alpha
   provider:
     name: Open Telekom Cloud
-  replaces: apimon-operator.v0.1.7
-  version: 0.1.8
+  replaces: apimon-operator.v0.1.8
+  version: 0.1.9

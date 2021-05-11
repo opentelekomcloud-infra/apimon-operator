@@ -72,4 +72,4 @@ statsd_resources:
 statsd_readiness_timeout: 5
 statsd_liveness_timeout: 2
 statsd_config: "{{ lookup('template', 'statsd-config.js.j2') }}"
-
+statsd_graphite_host: "graphite-carbon-relay"
